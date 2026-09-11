@@ -12,13 +12,6 @@ h2 {
   padding-top: 0.5em;
 }
 
-.topic {
-  margin: 0;
-  text-align: center;
-  color: #ff6263;
-  margin-bottom: 0.7em;
-}
-
 .input__container {
   display: flex;
   flex-direction: column;
@@ -209,7 +202,7 @@ p {
   }
 
   .lift-div {
-    width: 80x;
+    width: 80px;
     height: 100px;
     margin-left: 2em;
     border: 0.5px solid red;
@@ -256,7 +249,7 @@ p {
   }
 
   .lift-div {
-    width: 90x;
+    width: 90px;
     height: 100px;
     margin-left: 2.5em;
     border: 0.5px solid red;

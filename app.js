@@ -4,89 +4,67 @@ const submitButton = document.getElementById("submit-btn");
 const container = document.getElementById("container");
 const liftContainer = document.createElement("div");
 
-let floorVal = "";
-let liftVal = "";
-var prevFloor = 0;
+const MAX_FLOORS = 15;
+const MAX_LIFTS = 4;
 
+// Height of one floor in pixels; must match .floor height in styles.css
+const FLOOR_HEIGHT = 100;
+
+// Seconds a lift takes to travel one floor
+const SECONDS_PER_FLOOR = 2;
+
+// Floors requested while every lift was busy, served in order
 let targetFloors = [];
 
-// document.getElementById("floor-input").addEventListener("input", (e) => {
-//   floorVal = e.target.value;
-//   updateDisabled();
-// });
+// Last floor that was requested, used to ignore repeated clicks on the same button
+let lastRequestedFloor = null;
 
-// document.getElementById("lift-input").addEventListener("input", (e) => {
-//   liftVal = e.target.value;
-//   updateDisabled();
-// });
-
-// Disable function for submit
-// function updateDisabled() {
-//   if (liftVal.length === 0 || floorVal.length === 0) {
-//     submitButton.setAttribute("disabled", true);
-//   } else {
-//     submitButton.removeAttribute("disabled");
-//   }
-// }
-
-// updateDisabled();
-//on Submit button add values
+// On Submit button add values
 submitButton.addEventListener("click", () => {
-
+  const floors = parseInt(floorInput.value);
+  const lifts = parseInt(LiftInput.value);
 
   if (!LiftInput.value && !floorInput.value) {
     alert("Please Enter number to generate Floors and Lifts");
   } else if (!floorInput.value) {
-    alert("Please enter floor number in range 1-15");
+    alert(`Please enter floor number in range 1-${MAX_FLOORS}`);
   } else if (!LiftInput.value) {
-    alert("Please enter lift number in range 1-4");
-  } else if (LiftInput.value > 4) {
-    alert("Maximum 4 lifts are allowed!");
-  
-  }
-
-  else if (LiftInput.value == 0 || floorInput.value == 0){
-
-        alert('Value cannot be zero');
-  }
-  
-  
-  else if (floorInput.value > 15) {
-    alert("Maximum no of floors is 15!");
-   
-  } else if (LiftInput.value < 0 || floorInput.value < 0) {
+    alert(`Please enter lift number in range 1-${MAX_LIFTS}`);
+  } else if (lifts > MAX_LIFTS) {
+    alert(`Maximum ${MAX_LIFTS} lifts are allowed!`);
+  } else if (lifts === 0 || floors === 0) {
+    alert("Value cannot be zero");
+  } else if (floors > MAX_FLOORS) {
+    alert(`Maximum no of floors is ${MAX_FLOORS}!`);
+  } else if (lifts < 0 || floors < 0) {
     alert("No negative values are allowed");
-  
   } else {
-    container.innerHTML = " ";
+    container.innerHTML = "";
     liftContainer.innerHTML = "";
-    for (let i = floorInput.value; i > 0; i--) {
-      //Function to genereate floors
-      createFloors(i, LiftInput.value);
+    targetFloors = [];
+    lastRequestedFloor = null;
+
+    // Build floors top-down so floor 1 ends up at the bottom of the page
+    for (let i = floors; i > 0; i--) {
+      createFloors(i, lifts);
     }
 
-  //remove the values after submitting
-  LiftInput.value = "";
-  floorInput.value = "";
+    // Remove the values after submitting
+    LiftInput.value = "";
+    floorInput.value = "";
   }
-
- 
-
- 
 });
 
 // Function To Create Floors
-
 function createFloors(floors, lifts) {
   const floorDiv = document.createElement("div");
-
   floorDiv.classList.add("floordiv");
 
   const floorContainer = document.createElement("div");
   floorContainer.classList.add("floor");
   floorContainer.dataset.floor = floors;
 
-  //  button container
+  // Button container
   const buttonContainer = document.createElement("div");
   buttonContainer.classList.add("btn-div");
 
@@ -95,9 +73,6 @@ function createFloors(floors, lifts) {
 
   UpButton.classList.add("up-down");
   DownButton.classList.add("up-down");
-
-  UpButton.setAttribute("id", floors);
-  DownButton.setAttribute("id", floors);
 
   UpButton.innerText = "UP";
   DownButton.innerText = "Down";
@@ -108,35 +83,24 @@ function createFloors(floors, lifts) {
   buttonContainer.append(UpButton);
   buttonContainer.append(DownButton);
 
-  let floorNumber = document.createElement("p");
-
+  const floorNumber = document.createElement("p");
   floorNumber.classList.add("floorName");
-
   floorNumber.innerText = `No ${floors}`;
 
   buttonContainer.append(floorNumber);
-
   floorContainer.append(buttonContainer);
-
   floorDiv.append(floorContainer);
-
   container.append(floorDiv);
 
-  //Logic to generate Lifts
-
-  for (let j = 0; j < lifts; j++) {
-    //Check all lifts should be on 1st
-    if (floors === 1) {
-      let Lifts = document.createElement("div");
-
+  // Logic to generate Lifts: all lifts start on the ground floor (floor 1)
+  if (floors === 1) {
+    for (let j = 0; j < lifts; j++) {
+      const Lifts = document.createElement("div");
       Lifts.classList.add("lift-div");
-
       Lifts.setAttribute("onfloor", 1);
 
-      Lifts.dataset.currentLocation = prevFloor;
-
-      leftDoor = document.createElement("div");
-      RightDoor = document.createElement("div");
+      const leftDoor = document.createElement("div");
+      const RightDoor = document.createElement("div");
 
       leftDoor.classList.add("left-door");
       RightDoor.classList.add("right-door");
@@ -145,93 +109,80 @@ function createFloors(floors, lifts) {
       Lifts.appendChild(RightDoor);
 
       liftContainer.appendChild(Lifts);
-
-      liftContainer.classList.add("lift");
-
-      floorContainer.append(liftContainer);
-
-      floorDiv.append(floorContainer);
     }
+
+    liftContainer.classList.add("lift");
+    floorContainer.append(liftContainer);
   }
 }
 
-let x = 0;
-
-// Up down button getting clicked
+// Up / Down button getting clicked
 document.addEventListener("click", (e) => {
   if (e.target.classList.contains("up-down")) {
-    if (e.target.dataset.floor === x) {
+    const clickedFloor = parseInt(e.target.dataset.floor);
+
+    // Ignore a second click on the floor that was just requested
+    if (clickedFloor === lastRequestedFloor) {
       return;
-    } else {
-      LiftStatus(e.target.dataset.floor);
     }
 
-    x = e.target.dataset.floor;
+    LiftStatus(clickedFloor);
+    lastRequestedFloor = clickedFloor;
   }
 });
 
+// Decide which lift should serve the request for clickedFloor
 function LiftStatus(clickedFloor) {
   const lifts = document.querySelectorAll(".lift-div");
 
-  let pos;
-
+  // If a lift is already on (or heading to) this floor, nothing to do
   for (let i = 0; i < lifts.length; i++) {
-    if (lifts[i].classList.contains("engaged")) {
-      let onFloorVal = parseInt(lifts[i].getAttribute("onfloor"));
-
-      if (onFloorVal === clickedFloor) {
-        return;
-      }
-
-      console.log("check next");
-    } else {
-      for (let i = 0; i < lifts.length; i++) {
-        let onFloorVal = parseInt(lifts[i].getAttribute("onfloor"));
-
-        if (onFloorVal === clickedFloor) {
-          MoveLift(clickedFloor, i);
-          return;
-        }
-      }
-
-      pos = i;
-      MoveLift(clickedFloor, pos);
-      break;
+    const onFloorVal = parseInt(lifts[i].getAttribute("onfloor"));
+    if (onFloorVal === clickedFloor) {
+      return;
     }
   }
 
-  if (pos === undefined) {
-    targetFloors.push(clickedFloor);
+  // Otherwise send the first idle lift
+  for (let i = 0; i < lifts.length; i++) {
+    if (!lifts[i].classList.contains("engaged")) {
+      MoveLift(clickedFloor, i);
+      return;
+    }
   }
+
+  // Every lift is busy: queue the request
+  targetFloors.push(clickedFloor);
 }
 
+// Animate lift number `pos` to clickedFloor, open and close the doors,
+// then pick up the next queued request if there is one
 function MoveLift(clickedFloor, pos) {
   const elevators = document.getElementsByClassName("lift-div");
-
   const elevator = elevators[pos];
 
-  let currentFloor = elevator.getAttribute("onfloor");
-  let duration = Math.abs(parseInt(clickedFloor) - parseInt(currentFloor)) * 2;
+  const currentFloor = parseInt(elevator.getAttribute("onfloor"));
+  const duration = Math.abs(clickedFloor - currentFloor) * SECONDS_PER_FLOOR;
 
   elevator.setAttribute("onfloor", clickedFloor);
 
   elevator.style.transition = `transform ${duration}s linear`;
-  elevator.style.transform = `translateY(-${
-    100 * parseInt(clickedFloor) - 100
-  }px)`;
+  elevator.style.transform = `translateY(-${FLOOR_HEIGHT * (clickedFloor - 1)}px)`;
   elevator.classList.add("engaged");
 
+  // Open doors once the lift arrives
   setTimeout(() => {
     elevator.children[0].style.transform = "translateX(-100%)";
     elevator.children[1].style.transform = "translateX(100%)";
   }, duration * 1000 + 1000);
 
+  // Close doors
   setTimeout(() => {
     elevator.children[0].style.transform = "none";
     elevator.children[1].style.transform = "none";
   }, duration * 1000 + 4000);
 
-  //  Remove the busy status
+  // Remove the busy status and serve the next queued floor
   setTimeout(() => {
     elevator.classList.remove("engaged");
 
