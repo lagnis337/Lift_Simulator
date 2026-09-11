@@ -4,11 +4,13 @@ A browser-based simulation of a building with multiple lifts. You choose how man
 
 Written in plain **HTML, CSS and JavaScript** — no frameworks, no build step, no dependencies.
 
+**▶ Live demo: <https://lagnis337.github.io/Lift_Simulator/>**
+
 ![Lift Simulator with 4 floors and 3 lifts; the lift on floor 3 has its doors open](screenshot.png)
 
 ## Running it
 
-Clone the repo and open `index.html` in any browser — that's it.
+Try it in the browser at <https://lagnis337.github.io/Lift_Simulator/>, or clone the repo and open `index.html` — that's it.
 
 ```bash
 git clone https://github.com/lagnis337/Lift_Simulator.git
