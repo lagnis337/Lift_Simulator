@@ -3,19 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lift Simulation</title>
+    <title>Lift Simulator</title>
     <link rel="stylesheet" href="styles.css">
     <script src="app.js" defer></script>
 </head>
 <body>
+    <header class="top">
+        <div>
+            <h1>Lift Simulator</h1>
+            <p class="sub">Call a lift from any floor and watch the dispatcher work. Compare strategies, speed it up, or let random traffic run.</p>
+        </div>
+        <a class="src" href="https://github.com/lagnis337/Lift_Simulator">Source →</a>
+    </header>
 
-    <div class="input__container">
-        <input type="number" id="floor-input" placeholder="Enter the number of floors (1-15)" min="1" max="15"/>
-        <input type="number" id="lift-input" placeholder="Enter the number of lifts (1-4)" min="1" max="4"/>
-        <button type="submit" id="submit-btn">Submit</button>
-    </div>
+    <section class="controls">
+        <label>Floors <input type="number" id="floor-input" value="6" min="1" max="15"></label>
+        <label>Lifts <input type="number" id="lift-input" value="3" min="1" max="4"></label>
+        <label>Dispatch
+            <select id="strategy">
+                <option value="nearest">Nearest idle lift</option>
+                <option value="first">First idle lift</option>
+            </select>
+        </label>
+        <label>Speed
+            <select id="speed">
+                <option value="1">1×</option>
+                <option value="2" selected>2×</option>
+                <option value="4">4×</option>
+            </select>
+        </label>
+        <button id="submit-btn" class="primary">Build</button>
+        <button id="traffic-btn">Random traffic: off</button>
+        <p id="message" class="message" hidden></p>
+    </section>
 
-    <div class="container" id="container"></div>
+    <section class="stats">
+        <div><b id="stat-served">0</b><span>calls served</span></div>
+        <div><b id="stat-queue">0</b><span>waiting</span></div>
+        <div><b id="stat-wait">–</b><span>avg wait (s)</span></div>
+        <div><b id="stat-moves">0</b><span>floors travelled</span></div>
+    </section>
 
+    <section class="building" id="container"></section>
 </body>
 </html>
