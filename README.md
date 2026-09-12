@@ -6,7 +6,7 @@ Plain **HTML, CSS and JavaScript** — no frameworks, no build step, no dependen
 
 **▶ Live demo: <https://lagnis337.github.io/Lift_Simulator/>**
 
-![Lift Simulator: six floors, three lifts; one lift heading to floor 5, one with doors open on floor 3, a pending call lit on floor 5](screenshot.png)
+![Lift Simulator: six floors, three lifts; one lift heading to floor 5, one with doors open on floor 3, a pending call lit on floor 5](screenshot-v2.png)
 
 ## What you can do
 
